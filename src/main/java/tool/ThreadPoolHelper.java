@@ -22,7 +22,21 @@ public class ThreadPoolHelper {
         if (executor == null) {
             synchronized (ThreadPoolHelper.class) {
                 if (executor == null) {
-                    executor = new ThreadPoolExecutor(10, 20, 10, TimeUnit.SECONDS, new LinkedBlockingDeque(1000), new ThreadPoolExecutor.AbortPolicy());
+                    executor = new ThreadPoolExecutor(10, 20, 10, TimeUnit.SECONDS, new LinkedBlockingDeque(1000),
+                            new ThreadPoolExecutor.DiscardPolicy(){
+                               @Override
+                                public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+                                   // 放入的队列 并阻塞队列等待释放可用空间
+                                   try {
+                                       e.getQueue().put(r);
+                                   } catch (InterruptedException ex) {
+                                       // ....
+                                   }
+                                   // 丢弃头部任务并重新执行
+                                          //  e.getQueue().poll();
+                                          //  e.execute(r);
+                                }
+                            });
                 }
             }
         }
