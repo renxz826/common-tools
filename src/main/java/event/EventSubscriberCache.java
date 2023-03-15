@@ -84,9 +84,12 @@ public class EventSubscriberCache<K, V> extends HashMap<K, V> {
     private static List<Class<?>> getAllClass(File file, List<Class<?>> classes) throws ClassNotFoundException {
         if (file.isDirectory()) {
             File[] files = file.listFiles();
-            for (File subfile : files) {
-                getAllClass(subfile, classes);
+            if (!Objects.isNull(files)) {
+                for (File subFile : files) {
+                    getAllClass(subFile, classes);
+                }
             }
+
         }
         if (!file.isDirectory()) {
             if (file.getName().endsWith(POSTFIX_CLASSNAME)) {
