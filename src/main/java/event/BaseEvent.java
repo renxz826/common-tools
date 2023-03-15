@@ -17,10 +17,10 @@ public abstract class BaseEvent extends ApplicationEvent {
      */
     private Object source;
 
-    public BaseEvent(Object source) {
+    protected BaseEvent(Object source) {
         super(source);
     }
-    public BaseEvent(String description,Object source){
+    protected BaseEvent(String description,Object source){
         super(source);
         this.description=description;
     }

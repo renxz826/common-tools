@@ -18,6 +18,12 @@ public class ThreadPoolHelper {
 
     }
 
+    public static void main(String[] args) {
+        Runnable tun =() -> {
+            System.out.println("s");
+        };
+    }
+
     public static Executor initPool() {
         if (executor == null) {
             synchronized (ThreadPoolHelper.class) {

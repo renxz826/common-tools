@@ -1,6 +1,7 @@
 package event;
 
 import com.alibaba.fastjson.JSON;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
@@ -9,6 +10,7 @@ import org.springframework.util.ReflectionUtils;
 import tool.ApplicationContextHelper;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 /**
  * 事件监听器
@@ -22,21 +24,22 @@ public class EventListener implements ApplicationListener<BaseEvent> {
     private static final Logger log = LoggerFactory.getLogger(EventListener.class);
 
     @Override
-    public void onApplicationEvent(BaseEvent event) {
+    public void onApplicationEvent(@NotNull BaseEvent event) {
         log.info("EventListener | 监听事件 Event:{}", JSON.toJSONString(event));
         // 获取事件订阅者
         EventSubscriberCache<Class<?>, Method> cache = EventSubscriberCache.init();
-        cache.entrySet().forEach( entry ->{
-            Method method = entry.getValue();
+        for (Map.Entry<Class<?>, Method> entry : cache.entrySet()) {
             Class<?> aClass = entry.getKey();
-            Object bean = ApplicationContextHelper.getBean(aClass);
-            if (bean==null) {
-                return;
+            Method method = entry.getValue();
+            try {
+                Class<?> bean = (Class<?>) ApplicationContextHelper.getBean(aClass);
+                // invoke
+                ReflectionUtils.invokeMethod(method, bean, event);
+            }catch (Exception e){
+               log.error(e.getMessage());
             }
-            // invoke
-            ReflectionUtils.invokeMethod(method,bean,event);
-        });
 
+        }
     }
 
 
